@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aniversario 6 meses</title>
+    <style>
+        :root {
+            --bg-page: #fdf2f0;
+            --text-color: #6d4c41;
+            --accent-pink: #ff4081;
+            --trunk-color: #00897b;
+            --h-1: #ff5252; --h-2: #ff80ab; --h-3: #ffab40; --h-4: #f48fb1; --h-5: #ff1744;
+        }
+
+        body {
+            margin: 0; padding: 0;
+            display: flex; justify-content: center; align-items: center;
+            min-height: 100vh; background-color: var(--bg-page);
+            font-family: 'Segoe UI', sans-serif; overflow: hidden;
+        }
+
+        .card {
+            width: 90%;
+            max-width: 500px;
+            height: 500px;
+            background: rgba(255, 255, 255, 0.88);
+            backdrop-filter: blur(8px);
+            padding: 30px;
+            position: relative;
+            box-shadow: 0 25px 50px rgba(0,0,0,0.12);
+            border-radius: 24px;
+            z-index: 10;
+            border: 1px solid rgba(255, 255, 255, 0.6);
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* --- Contenedor del Árbol (Bajado completo) --- */
+        .tree-container {
+            position: absolute;
+            right: 25px;
+            /* Bajamos el bloque entero para que el tronco toque la línea */
+            bottom: 112px; 
+            width: 150px;
+            height: 230px; 
+            pointer-events: none;
+            z-index: 5;
+        }
+
+        .trunk {
+            position: absolute;
+            bottom: 0; 
+            left: 50%;
+            transform: translateX(-50%);
+            width: 12px;
+            height: 80px; /* Tronco corto y natural */
+            background: var(--trunk-color);
+            border-radius: 6px 6px 0 0;
+        }
+
+        .heart-crown {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 150px;
+            clip-path: path('M75,150 C75,150 5,115 5,55 A35,35 0 1,1 75,55 L75,60 L75,55 A35,35 0 1,1 145,55 C145,115 75,150 75,150 Z');
+        }
+
+        .heart { position: absolute; width: 8px; height: 8px; transform: rotate(-45deg); }
+        .heart::before, .heart::after {
+            content: ""; position: absolute; width: 8px; height: 8px;
+            background-color: inherit; border-radius: 50%;
+        }
+        .heart::before { top: -4px; left: 0; }
+        .heart::after { top: 0; left: 4px; }
+
+        .heart-crown .heart { animation: pulse 1.2s ease-in-out infinite alternate; }
+        @keyframes pulse { to { transform: rotate(-45deg) scale(1.15); } }
+
+        .falling-heart {
+            position: fixed; top: -25px; z-index: 1;
+            pointer-events: none; animation: fallAnimation linear forwards;
+        }
+        @keyframes fallAnimation { to { transform: translateY(110vh) rotate(360deg); opacity: 0; } }
+
+        .content { width: 55%; line-height: 1.4; color: var(--text-color); font-size: 0.95rem; z-index: 11; }
+        .typing::after { content: '|'; animation: blink 0.7s infinite; color: var(--accent-pink); }
+        @keyframes blink { 50% { opacity: 0; } }
+
+        .counter-section {
+            margin-top: auto;
+            border-top: 2px solid #e0d4d0;
+            padding-top: 15px;
+            text-align: center;
+            position: relative;
+            z-index: 10;
+        }
+        .number { font-size: 1.2rem; font-weight: bold; color: #d81b60; }
+
+        /* Responsivo para móviles */
+        @media (max-width: 450px) {
+            .content { width: 100%; margin-top: 10px; margin-bottom: 240px;}
+            .tree-container { left: 50%; transform: translateX(-50%); bottom: 112px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="card">
+        <div class="content">
+            <h2 id="titulo"></h2>
+            <p id="parrafo1"></p>
+            <p id="parrafo2"></p>
+            <div id="firma" style="font-weight: bold;"></div>
+        </div>
+        
+        <div class="tree-container">
+            <div class="heart-crown" id="heartCrown"></div>
+            <div class="trunk"></div>
+        </div>
+
+        <div class="counter-section">
+            <div style="font-size: 0.8rem;">Tiempo compartiendo felicidad:</div>
+            <div class="timer">
+                <span id="dias" class="number">0</span>d 
+                <span id="horas" class="number">00</span>h 
+                <span id="minutos" class="number">00</span>m 
+                <span id="segundos" class="number">00</span>s
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const colors = ['#ff5252', '#ff4081', '#ffab40', '#f48fb1', '#ff1744'];
+        
+        function crearCopa() {
+            const crown = document.getElementById('heartCrown');
+            const totalHearts = 300; 
+            for (let i = 0; i < totalHearts; i++) {
+                const h = document.createElement('div');
+                h.className = 'heart';
+                h.style.left = Math.random() * 100 + '%';
+                h.style.top = Math.random() * 100 + '%';
+                h.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+                h.style.transform = `rotate(${-45 + (Math.random()*20-10)}deg) scale(${Math.random()*0.5+0.5})`;
+                h.style.animationDelay = Math.random() * 2 + 's';
+                crown.appendChild(h);
+            }
+        }
+
+        function lluvia() {
+            const h = document.createElement('div');
+            h.className = 'heart falling-heart';
+            h.style.width = '10px'; h.style.height = '10px';
+            h.style.left = Math.random() * 100 + 'vw';
+            h.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+            const dur = Math.random() * 3 + 4;
+            h.style.animationDuration = dur + 's';
+            document.body.appendChild(h);
+            setTimeout(() => h.remove(), dur * 1000);
+        }
+
+        async function escribir(id, texto) {
+            const el = document.getElementById(id);
+            if(!el) return;
+            el.classList.add('typing');
+            for (let char of texto) {
+                el.textContent += char;
+                await new Promise(r => setTimeout(r, 5));
+            }
+            el.classList.remove('typing');
+        }
+
+        const textos = [
+            { id: "titulo", contenido: "Para mi Nutria:" },
+            { id: "parrafo1", contenido: "Eres mi amor y mi mayor alegría." },
+            { id: "parrafo2", contenido: "Este árbol crece como nuestro amor." },
+            { id: "firma", contenido: "— Te amo, felices 6 meses _" }
+        ];
+
+        // Cambié la fecha a 2023 para que el contador muestre tiempo real transcurrido
+        const fecha = new Date("October 27, 2025 00:00:00").getTime();
+
+        function update() {
+            const diff = new Date().getTime() - fecha;
+            if(diff < 0) return;
+            document.getElementById("dias").innerText = Math.floor(diff / 86400000);
+            document.getElementById("horas").innerText = Math.floor((diff % 86400000) / 3600000).toString().padStart(2,'0');
+            document.getElementById("minutos").innerText = Math.floor((diff % 3600000) / 60000).toString().padStart(2,'0');
+            document.getElementById("segundos").innerText = Math.floor((diff % 60000) / 1000).toString().padStart(2,'0');
+        }
+
+        window.onload = async () => {
+            crearCopa();
+            setInterval(lluvia, 200);
+            setInterval(update, 1000);
+            update();
+            for (let t of textos) {
+                await escribir(t.id, t.contenido);
+                await new Promise(r => setTimeout(r, 150));
+            }
+        };
+    </script>
+</body>
+</html>
